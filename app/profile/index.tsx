@@ -5,12 +5,13 @@ import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
 import React from "react";
 import { Text, Image, TouchableOpacity, FlatList } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const ProfileHeader = () => {
   return (
     <Box className="bg-primary-violet rounded-b-3xl p-6 mb-4">
       <TouchableOpacity className=" items-end">
-        <Text className="text-white text-xl">✎</Text>
+        <Icon name="create-outline" size={24} color="white" />
       </TouchableOpacity>
       <VStack className="items-center mt-4">
         <Text className="text-white text-lg font-bold mb-4">Profile</Text>
@@ -31,20 +32,20 @@ const TotalProgress = () => {
       <HStack className="justify-between">
         <Text className="text-lg font-bold">Total progress</Text>
         <TouchableOpacity>
-          <Text className="text-gray-500">›</Text>
+          <Icon name="chevron-forward-outline" size={24} color="gray" />
         </TouchableOpacity>
       </HStack>
       <HStack className="justify-around mt-4">
         <VStack className="items-center">
-          <Text className="text-2xl">🏃‍♂️</Text>
+          <Icon name="walk-outline" size={30} color="black" />
           <Text className="text-lg font-bold">103,2 km</Text>
         </VStack>
         <VStack className="items-center">
-          <Text className="text-2xl">⏱</Text>
+          <Icon name="time-outline" size={30} color="black" />
           <Text className="text-lg font-bold">16,9 hr</Text>
         </VStack>
         <VStack className="items-center">
-          <Text className="text-2xl">🔥</Text>
+          <Icon name="flame-outline" size={30} color="black" />
           <Text className="text-lg font-bold">1,5k kcal</Text>
         </VStack>
       </HStack>
@@ -54,10 +55,10 @@ const TotalProgress = () => {
 
 const MenuList = () => {
   const menuItems = [
-    { icon: "👋", label: "Personal parameters" },
-    { icon: "🏆", label: "Achievements" },
-    { icon: "⚙️", label: "Settings" },
-    { icon: "📞", label: "Our contact" }
+    { icon: "person-outline", label: "Personal parameters" },
+    { icon: "trophy-outline", label: "Achievements" },
+    { icon: "settings-outline", label: "Settings" },
+    { icon: "call-outline", label: "Our contact" }
   ];
 
   return (
@@ -68,20 +69,22 @@ const MenuList = () => {
         <Box className="bg-white rounded-xl p-4 shadow flex flex-col gap-8 mb-4">
           <TouchableOpacity className="flex-row justify-between items-center">
             <HStack className="items-center">
-              <Text className="text-2xl mr-3">{item.icon}</Text>
+              <Icon
+                name={item.icon}
+                size={24}
+                color="gray"
+                style={{ marginRight: 12 }}
+              />
               <Text className="text-lg text-gray-700">{item.label}</Text>
             </HStack>
-            <TouchableOpacity className="flex-row justify-between items-center">
-              <Image
-                source={require("../../assets/images/arrow.png")}
-                className="w-4 h-4"
-              />
+            <TouchableOpacity>
+              <Icon name="chevron-forward-outline" size={24} color="gray" />
             </TouchableOpacity>
           </TouchableOpacity>
         </Box>
       )}
-      showsVerticalScrollIndicator={false} // Facultatif
-      contentContainerStyle={{ paddingBottom: 20 }} // Ajoute un espace en bas
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 20 }}
     />
   );
 };

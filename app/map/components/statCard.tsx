@@ -4,7 +4,18 @@ import { Ionicons } from "@expo/vector-icons";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
 
-const StatsCard = ({
+interface StatsCardProps {
+  time: string;
+  distance: number;
+  calories: number;
+  speed: number;
+  isRunning: boolean;
+  onStop: () => void;
+  onResume: () => void;
+  onPause: () => void;
+}
+
+const StatsCard: React.FC<StatsCardProps> = ({
   time,
   distance,
   calories,
@@ -16,7 +27,6 @@ const StatsCard = ({
 }) => {
   return (
     <View className="absolute bottom-12 left-4 right-4 bg-white rounded-lg shadow-lg p-4">
-      {/* Temps de course */}
       <View className="flex-row justify-between items-center mb-4">
         <VStack>
           <Text className="text-gray-500 text-sm">Running time</Text>
@@ -25,13 +35,13 @@ const StatsCard = ({
         <HStack className="gap-4">
           {!isRunning && (
             <TouchableOpacity
-              className={`w-12 h-12 flex justify-center items-center rounded-full ${"bg-red-600"}`}
+              className="w-12 h-12 flex justify-center items-center rounded-full bg-red-600"
               onPress={onStop}>
               <Ionicons name={"stop"} size={24} color="white" />
             </TouchableOpacity>
           )}
           <TouchableOpacity
-            className={`w-12 h-12 flex justify-center items-center rounded-full ${"bg-primary-violet"}`}
+            className="w-12 h-12 flex justify-center items-center rounded-full bg-primary-violet"
             onPress={isRunning ? onPause : onResume}>
             <Ionicons
               name={isRunning ? "pause" : "play"}
@@ -42,7 +52,7 @@ const StatsCard = ({
         </HStack>
       </View>
 
-      <View className="flex-row justify-between ">
+      <View className="flex-row justify-between">
         <View className="items-center bg-primary-violet rounded-md p-4">
           <Ionicons name="walk" size={24} color="orange" />
           <Text className="text-white text-xl font-bold">

@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
-import MapView, { Marker, Polyline } from "react-native-maps";
+import MapView, { Marker, Polyline, Region } from "react-native-maps";
 import * as Location from "expo-location";
 import StatsCard from "./components/statCard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const JoggingScreen = () => {
-  const [location, setLocation] = useState(null);
-  const [route, setRoute] = useState([]);
+const JoggingScreen: React.FC = () => {
+  const [location, setLocation] = useState<Coordinate | null>(null);
+  const [route, setRoute] = useState<Coordinate[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [distance, setDistance] = useState(0);
   const [calories, setCalories] = useState(0);
   const [speed, setSpeed] = useState(0);
-  const [startTime, setStartTime] = useState(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState("00:00:00");
   const [pausedTime, setPausedTime] = useState(0);
-  const [region, setRegion] = useState(null);
+  // const [region, setRegion] = useState<Region | null>(null);
 
   useEffect(() => {
     const initializeLocation = async () => {
@@ -29,27 +29,25 @@ const JoggingScreen = () => {
       const { latitude, longitude } = currentLocation.coords;
 
       setLocation({ latitude, longitude });
-      setRegion({
-        latitude,
-        longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01
-      });
+      // setRegion({
+      //   latitude,
+      //   longitude,
+      //   latitudeDelta: 0.01,
+      //   longitudeDelta: 0.01
+      // });
     };
 
     initializeLocation();
   }, []);
 
   useEffect(() => {
-    let timerInterval;
-    let locationSubscription;
+    let timerInterval: NodeJS.Timeout | null = null;
+    let locationSubscription: Location.LocationSubscription | undefined;
 
     if (isRunning) {
-      // Reprendre avec le temps accumulé
       const initialStartTime = Date.now() - pausedTime;
       setStartTime(initialStartTime);
 
-      // Timer pour mettre à jour le temps écoulé
       timerInterval = setInterval(() => {
         const timeDiff = Date.now() - initialStartTime;
         const hours = Math.floor(timeDiff / 3600000);
@@ -63,7 +61,6 @@ const JoggingScreen = () => {
         );
       }, 1000);
 
-      // Suivi de position
       const startTracking = async () => {
         locationSubscription = await Location.watchPositionAsync(
           {
@@ -75,16 +72,19 @@ const JoggingScreen = () => {
             const newPoint = { latitude, longitude };
 
             setLocation(newPoint);
-            setRegion((prevRegion) => ({
-              ...prevRegion,
-              latitude,
-              longitude
-            }));
+            // setRegion((prevRegion) =>
+            //   prevRegion
+            //     ? {
+            //         ...prevRegion,
+            //         latitude,
+            //         longitude
+            //       }
+            //     : null
+            // );
 
             setRoute((prevRoute) => {
               if (prevRoute.length > 0) {
                 const lastPoint = prevRoute[prevRoute.length - 1];
-
                 const segmentDistance = calculateDistance(
                   lastPoint.latitude,
                   lastPoint.longitude,
@@ -92,10 +92,8 @@ const JoggingScreen = () => {
                   longitude
                 );
                 setDistance((prevDistance) => prevDistance + segmentDistance);
-
                 const timeInHours = 5 / 3600;
                 setSpeed(segmentDistance / timeInHours);
-
                 setCalories(
                   (prevCalories) => prevCalories + segmentDistance * 70
                 );
@@ -109,9 +107,8 @@ const JoggingScreen = () => {
 
       startTracking();
     } else {
-      clearInterval(timerInterval);
+      if (timerInterval) clearInterval(timerInterval);
       if (startTime) {
-        // Ajoutez le temps écoulé au temps accumulé
         setPausedTime(
           (prevPausedTime) => prevPausedTime + (Date.now() - startTime)
         );
@@ -122,15 +119,20 @@ const JoggingScreen = () => {
     }
 
     return () => {
-      clearInterval(timerInterval);
+      if (timerInterval) clearInterval(timerInterval);
       if (locationSubscription) {
         locationSubscription.remove();
       }
     };
   }, [isRunning]);
 
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const toRad = (value) => (value * Math.PI) / 180;
+  const calculateDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number
+  ): number => {
+    const toRad = (value: number): number => (value * Math.PI) / 180;
     const R = 6371;
     const dLat = toRad(lat2 - lat1);
     const dLon = toRad(lon2 - lon1);
@@ -146,7 +148,7 @@ const JoggingScreen = () => {
 
   const onPause = async () => {
     try {
-      setIsRunning(false); // Met en pause la course
+      setIsRunning(false);
       await AsyncStorage.setItem(
         "currentJogging",
         JSON.stringify({
@@ -164,23 +166,19 @@ const JoggingScreen = () => {
   const onStop = async () => {
     try {
       const storedData = await AsyncStorage.getItem("joggingData");
-      console.log("Stored data before parsing:", storedData);
-
-      let previousParkours = [];
+      let previousParkours: Parkour[] = [];
       if (storedData) {
         try {
           previousParkours = JSON.parse(storedData);
           if (!Array.isArray(previousParkours)) {
             throw new Error("Invalid data format");
           }
-        } catch (error) {
-          console.warn("Corrupted data, resetting to empty array.");
+        } catch {
           previousParkours = [];
         }
       }
 
-      // Ajouter le nouveau parcours
-      const newParkour = {
+      const newParkour: Parkour = {
         time: elapsedTime,
         distance: distance.toFixed(1),
         calories: calories.toFixed(1),
@@ -193,13 +191,11 @@ const JoggingScreen = () => {
 
       const updatedParkours = [newParkour, ...previousParkours];
 
-      // Enregistrer le tableau mis à jour
       await AsyncStorage.setItem(
         "joggingData",
         JSON.stringify(updatedParkours)
       );
 
-      // Réinitialiser les états locaux
       setStartTime(null);
       setElapsedTime("00:00:00");
       setPausedTime(0);
@@ -207,8 +203,6 @@ const JoggingScreen = () => {
       setCalories(0);
       setDistance(0);
       setRoute([]);
-
-      // Supprimer la course en cours
       await AsyncStorage.removeItem("currentJogging");
     } catch (error) {
       console.error("Error updating jogging data:", error);
@@ -219,15 +213,14 @@ const JoggingScreen = () => {
     <View style={{ flex: 1 }}>
       <MapView
         style={{ width: "100%", height: "100%" }}
-        region={region}
-        showsUserLocation={true}
-        followsUserLocation={true}>
+        // region={region}
+        showsUserLocation
+        followsUserLocation>
         {location && <Marker coordinate={location} title="Vous êtes ici" />}
         {route.length > 1 && (
           <Polyline coordinates={route} strokeColor="#1E90FF" strokeWidth={4} />
         )}
       </MapView>
-
       <StatsCard
         time={elapsedTime}
         distance={distance}

@@ -13,13 +13,13 @@ export default function AppTabs() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+          let iconName: string;
 
           if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "Map") {
             iconName = focused ? "map" : "map-outline";
-          } else if (route.name === "Profile") {
+          } else {
             iconName = focused ? "person" : "person-outline";
           }
 

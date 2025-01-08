@@ -9,22 +9,21 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "@/components/AppBar";
 import { useFocusEffect } from "@react-navigation/native";
 
-export default function Dashboard() {
-  const [parkour, setParkour] = useState([]);
-  const [currentParkour, setCurrentParkour] = useState(null);
+const Dashboard: React.FC = () => {
+  const [parkour, setParkour] = useState<Parkour[]>([]);
+  const [currentParkour, setCurrentParkour] = useState<Parkour | null>(null);
 
   useFocusEffect(
     React.useCallback(() => {
       const loadParkours = async () => {
         try {
-          // Récupérer les données depuis AsyncStorage
           const recentJogging = await AsyncStorage.getItem("joggingData");
           const currentJoggingData = await AsyncStorage.getItem(
             "currentJogging"
           );
+
           if (recentJogging) {
             const parsedData = JSON.parse(recentJogging);
-
             if (Array.isArray(parsedData)) {
               setParkour(parsedData);
             } else {
@@ -37,6 +36,7 @@ export default function Dashboard() {
           } else {
             setParkour([]);
           }
+
           if (currentJoggingData) {
             const parsedData = JSON.parse(currentJoggingData);
             const today = new Date().toLocaleDateString("en-US", {
@@ -44,10 +44,10 @@ export default function Dashboard() {
               day: "numeric"
             });
 
-            const newEntry = {
+            const newEntry: Parkour = {
               date: today,
               distance: `${parsedData.distance} km`,
-              kcal: parsedData.calories,
+              calories: parsedData.calories,
               speed: `${parsedData.speed} km/hr`,
               time: `${parsedData.time} min`
             };
@@ -56,9 +56,10 @@ export default function Dashboard() {
           }
         } catch (error) {
           console.error("Error loading parkours from AsyncStorage:", error);
-          setParkour([]); // En cas d'erreur, initialiser à un tableau vide
+          setParkour([]);
         }
       };
+
       loadParkours();
     }, [])
   );
@@ -81,20 +82,20 @@ export default function Dashboard() {
                     Current jogging
                   </Text>
                   <Text className="text-gray-200 text-sm">
-                    {currentParkour?.date || "No data"}
+                    {currentParkour.date}
                   </Text>
                 </VStack>
               </HStack>
-              <VStack className=" justify-end items-end">
+              <VStack className="justify-end items-end">
                 <Text className="text-white text-lg font-bold">
-                  {currentParkour?.time || "00:00:00"}
+                  {currentParkour.time}
                 </Text>
                 <HStack className="items-center justify-center gap-2">
                   <Text className="text-white text-sm">
-                    {currentParkour?.distance || "0.0 km"}
+                    {currentParkour.distance}
                   </Text>
                   <Text className="text-gray-200 text-sm">
-                    {currentParkour?.kcal || 0} kcal
+                    {currentParkour.calories} kcal
                   </Text>
                 </HStack>
               </VStack>
@@ -110,7 +111,7 @@ export default function Dashboard() {
           {parkour.length > 0 ? (
             <FlatList
               data={parkour}
-              keyExtractor={(item, index) => index.toString()}
+              keyExtractor={(_, index) => index.toString()}
               renderItem={({ item }) => (
                 <Box className="bg-white rounded-xl p-4 shadow flex flex-col gap-8 mb-4">
                   <HStack className="justify-between items-center">
@@ -127,7 +128,7 @@ export default function Dashboard() {
                           <Text className="text-lg font-bold">
                             {item.distance}
                           </Text>
-                          <Text className="text-gray-500 text-sm">{`${item.calories} kcal  ${item.speed} km/hr`}</Text>
+                          <Text className="text-gray-500 text-sm">{`${item.calories} kcal  ${item.speed}`}</Text>
                         </VStack>
                         <Text className="text-lg font-bold">{item.time}</Text>
                       </HStack>
@@ -141,8 +142,8 @@ export default function Dashboard() {
                   </HStack>
                 </Box>
               )}
-              showsVerticalScrollIndicator={false} // Facultatif
-              contentContainerStyle={{ paddingBottom: 20 }} // Ajoute un espace en bas
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 20 }}
             />
           ) : (
             <Text className="text-gray-500 text-center">
@@ -153,4 +154,6 @@ export default function Dashboard() {
       </Box>
     </Box>
   );
-}
+};
+
+export default Dashboard;
