@@ -1,5 +1,4 @@
 import "@/global.css";
-import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
@@ -7,9 +6,10 @@ import React, { useEffect, useState } from "react";
 import { Text, Image, TouchableOpacity, FlatList } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "@/components/AppBar";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 const Dashboard: React.FC = () => {
+  const navigation = useNavigation();
   const [parkour, setParkour] = useState<Parkour[]>([]);
   const [currentParkour, setCurrentParkour] = useState<Parkour | null>(null);
 
@@ -73,34 +73,39 @@ const Dashboard: React.FC = () => {
       <Header />
       <Box className="flex-1 p-4">
         {currentParkour && (
-          <Box className="bg-primary-violet rounded-full p-4 mb-4 shadow">
-            <HStack className="justify-between">
-              <HStack className="items-center">
-                <Text className="text-4xl mr-3">🏃‍♂️</Text>
-                <VStack>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("Map");
+            }}>
+            <Box className="bg-primary-violet rounded-full p-4 mb-4 shadow">
+              <HStack className="justify-between">
+                <HStack className="items-center">
+                  <Text className="text-4xl mr-3">🏃‍♂️</Text>
+                  <VStack>
+                    <Text className="text-white text-lg font-bold">
+                      Current jogging
+                    </Text>
+                    <Text className="text-gray-200 text-sm">
+                      {currentParkour.date}
+                    </Text>
+                  </VStack>
+                </HStack>
+                <VStack className="justify-end items-end">
                   <Text className="text-white text-lg font-bold">
-                    Current jogging
+                    {currentParkour.time}
                   </Text>
-                  <Text className="text-gray-200 text-sm">
-                    {currentParkour.date}
-                  </Text>
+                  <HStack className="items-center justify-center gap-2">
+                    <Text className="text-white text-sm">
+                      {currentParkour.distance}
+                    </Text>
+                    <Text className="text-gray-200 text-sm">
+                      {currentParkour.calories} kcal
+                    </Text>
+                  </HStack>
                 </VStack>
               </HStack>
-              <VStack className="justify-end items-end">
-                <Text className="text-white text-lg font-bold">
-                  {currentParkour.time}
-                </Text>
-                <HStack className="items-center justify-center gap-2">
-                  <Text className="text-white text-sm">
-                    {currentParkour.distance}
-                  </Text>
-                  <Text className="text-gray-200 text-sm">
-                    {currentParkour.calories} kcal
-                  </Text>
-                </HStack>
-              </VStack>
-            </HStack>
-          </Box>
+            </Box>
+          </TouchableOpacity>
         )}
 
         <Box className="flex-1">

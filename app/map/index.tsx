@@ -15,7 +15,6 @@ const JoggingScreen: React.FC = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState("00:00:00");
   const [pausedTime, setPausedTime] = useState(0);
-  // const [region, setRegion] = useState<Region | null>(null);
 
   useEffect(() => {
     const initializeLocation = async () => {
@@ -29,12 +28,6 @@ const JoggingScreen: React.FC = () => {
       const { latitude, longitude } = currentLocation.coords;
 
       setLocation({ latitude, longitude });
-      // setRegion({
-      //   latitude,
-      //   longitude,
-      //   latitudeDelta: 0.01,
-      //   longitudeDelta: 0.01
-      // });
     };
 
     initializeLocation();
@@ -72,15 +65,6 @@ const JoggingScreen: React.FC = () => {
             const newPoint = { latitude, longitude };
 
             setLocation(newPoint);
-            // setRegion((prevRegion) =>
-            //   prevRegion
-            //     ? {
-            //         ...prevRegion,
-            //         latitude,
-            //         longitude
-            //       }
-            //     : null
-            // );
 
             setRoute((prevRoute) => {
               if (prevRoute.length > 0) {
@@ -213,7 +197,6 @@ const JoggingScreen: React.FC = () => {
     <View style={{ flex: 1 }}>
       <MapView
         style={{ width: "100%", height: "100%" }}
-        // region={region}
         showsUserLocation
         followsUserLocation>
         {location && <Marker coordinate={location} title="Vous êtes ici" />}
