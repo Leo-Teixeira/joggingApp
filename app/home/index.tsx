@@ -7,9 +7,11 @@ import { Text, Image, TouchableOpacity, FlatList } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "@/components/AppBar";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 
 const Dashboard: React.FC = () => {
   const navigation = useNavigation();
+  const router = useRouter();
   const [parkour, setParkour] = useState<Parkour[]>([]);
   const [currentParkour, setCurrentParkour] = useState<Parkour | null>(null);
 
@@ -111,7 +113,12 @@ const Dashboard: React.FC = () => {
         <Box className="flex-1">
           <Box className="flex flex-row justify-between mb-4">
             <Text className="text-lg font-bold">Recent activity</Text>
-            <Text className="text-primary-violet text-lg font-bold">All</Text>
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/parkour");
+              }}>
+              <Text className="text-primary-violet text-lg font-bold">All</Text>
+            </TouchableOpacity>
           </Box>
           {parkour.length > 0 ? (
             <FlatList
